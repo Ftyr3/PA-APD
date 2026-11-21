@@ -5,6 +5,7 @@ import tampilan
 import validasi
 from data import MENU_ADMIN, MENU_USER
 
+
 while True:
     if auth.level_aktif == "":
         tampilan.tampilkan_judul("SISTEM PENGELOLAAN ANGGOTA DAN JADWAL MABAR TIM")
@@ -32,12 +33,14 @@ while True:
             crud.tambah_anggota()
         elif aksi == "Lihat semua anggota":
             crud.lihat_anggota()
-        elif aksi == "Cari anggota berdasarkan role":
+        elif aksi == "Cari anggota berdasarkan game dan role":
             crud.cari_anggota()
         elif aksi == "Ubah data anggota":
             crud.ubah_anggota()
         elif aksi == "Hapus anggota":
             crud.hapus_anggota()
+        elif aksi == "Kelola game dan role":
+            crud.menu_role()
         elif aksi == "Jumlah anggota per role":
             statistik.lihat_statistik()
         else:

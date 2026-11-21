@@ -14,7 +14,7 @@ def tampilkan_judul(teks):
 
 
 def tampilkan_menu(daftar_menu):
-    tabel = PrettyTable()                              
+    tabel = PrettyTable()
     tabel.field_names = ["No", "Menu"]
     tabel.align["Menu"] = "l"
     for i in range(len(daftar_menu)):
@@ -22,20 +22,37 @@ def tampilkan_menu(daftar_menu):
     print(tabel)
 
 
+def format_game(daftar_game):
+    teks = []
+    for game, role in daftar_game.items():
+        teks.append(game + " (" + role + ")")
+    return ", ".join(teks)
+
+
 def tampilkan_anggota(data):
     if len(data) == 0:
         print("Tidak ada data anggota.")
     else:
         tabel = PrettyTable()
-        tabel.field_names = ["No", "Nama", "Role", "Kapan bisa main"]
+        tabel.field_names = ["No", "Nama", "Game (Role)", "Kapan bisa main"]
         tabel.align["Nama"] = "l"
-        tabel.align["Role"] = "l"
+        tabel.align["Game (Role)"] = "l"
         tabel.align["Kapan bisa main"] = "l"
-        nomor = 1                                      
+        nomor = 1
         for nama, info in data.items():
-            tabel.add_row([nomor, nama, info["role"], info["jadwal"]])
+            tabel.add_row([nomor, nama, format_game(info["game"]), info["jadwal"]])
             nomor += 1
         print(tabel)
+
+
+def tampilkan_role(data_role):
+    tabel = PrettyTable()
+    tabel.field_names = ["Game", "Role"]
+    tabel.align["Game"] = "l"
+    tabel.align["Role"] = "l"
+    for game, daftar_role in data_role.items():
+        tabel.add_row([game, ", ".join(daftar_role)])
+    print(tabel)
 
 
 def tampilkan_statistik(hasil):
