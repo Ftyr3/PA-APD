@@ -3,16 +3,28 @@ import tampilan
 import validasi
 
 
+def konfirmasi(pesan):
+    while True:
+        jawab = input(pesan + " (y/t): ").strip().lower()
+        if jawab in ("y", "t"):
+            return jawab == "y"
+        print("Input tidak valid! Masukkan y atau t.")
+
+
 def minta_daftar_game():
     daftar_game = {}
     while True:
         sisa = [g for g in GAME if g not in daftar_game]
-        game = validasi.pilih_game(sisa)
-        daftar_game[game] = validasi.pilih_role(game)
-        if len(daftar_game) == len(GAME):
+        if len(sisa) == 0:
             print("Semua game sudah dipilih.")
             break
-        lagi = input("Tambah game lain? (y/t): ").strip().lower()
+        game = validasi.pilih_game(sisa)
+        daftar_game[game] = validasi.pilih_role(game)
+        while True:
+            lagi = input("Tambah game lain? (y/n): ").strip().lower()
+            if lagi in ("y", "n"):
+                break
+            print("Input tidak valid! Masukkan y atau n.")
         if lagi != "y":
             break
     return daftar_game
@@ -21,19 +33,19 @@ def minta_daftar_game():
 def kelola_game_anggota(data):
     while True:
         print("\nGame saat ini:", tampilan.format_game(data["game"]))
-        tampilan.tampilkan_menu(("Tambah game", "Ubah role di game", "Hapus game", "Selesai"))
-        pilih = validasi.minta_angka("Pilih: ", 4)
-        if pilih == 1:
+        aksi = validasi.pilih_dari_daftar("Kelola game anggota",
+                                          ("Tambah game", "Ubah role di game", "Hapus game", "Selesai"))
+        if aksi == "Tambah game":
             sisa = [g for g in GAME if g not in data["game"]]
             if len(sisa) == 0:
                 print("Semua game sudah terdaftar.")
             else:
                 game = validasi.pilih_game(sisa)
                 data["game"][game] = validasi.pilih_role(game)
-        elif pilih == 2:
+        elif aksi == "Ubah role di game":
             game = validasi.pilih_game(list(data["game"]))
             data["game"][game] = validasi.pilih_role(game)
-        elif pilih == 3:
+        elif aksi == "Hapus game":
             if len(data["game"]) == 1:
                 print("Minimal harus ada 1 game.")
             else:
@@ -47,15 +59,14 @@ def tambah_anggota():
     print("\n--- TAMBAH ANGGOTA ---")
     nama_baru = validasi.minta_nama_baru()
     game_baru = minta_daftar_game()
-    try:
+    while True:
         jadwal_baru = input("Kapan bisa main? (contoh: Senin): ").strip()
         if jadwal_baru == "":
-            raise ValueError("Jadwal tidak boleh kosong!")
-    except ValueError as pesan_error:
-        print(pesan_error, "Data tidak disimpan.")
-    else:
-        anggota[nama_baru] = {"game": game_baru, "jadwal": jadwal_baru}
-        print("Anggota berhasil ditambahkan!")
+            print("Jadwal tidak boleh kosong!")
+        else:
+            break
+    anggota[nama_baru] = {"game": game_baru, "jadwal": jadwal_baru}
+    print("Anggota berhasil ditambahkan!")
 
 
 def lihat_anggota():
@@ -77,52 +88,49 @@ def cari_anggota():
 
 def ubah_anggota():
     print("\n--- UBAH DATA ANGGOTA ---")
-    try:
-        if len(anggota) == 0:
-            raise ValueError("Belum ada anggota.")
-        tampilan.tampilkan_anggota(anggota)
-        nama = input("Ketik nama anggota yang diubah: ").strip()
-        data = anggota[nama]
-    except ValueError as pesan_error:
-        print(pesan_error)
-    except KeyError:
-        print("Anggota tidak ditemukan.")
-    else:
-        print("Kosongkan (Enter) jika tidak ingin mengubah bagian itu.")
-        nama_baru = input("Nama baru: ").strip()
+    if len(anggota) == 0:
+        print("Belum ada anggota.")
+        return
+    nama = validasi.pilih_anggota()
+    if nama is None:
+        print("Dibatalkan.")
+        return
+    data = anggota[nama]
+    print("Kosongkan (Enter) jika tidak ingin mengubah bagian itu.")
+    nama_baru = input("Nama baru: ").strip()
+    while True:
         kelola = input("Kelola game & role? (y/t): ").strip().lower()
-        if kelola == "y":
-            kelola_game_anggota(data)
-        jadwal_baru = input("Jadwal baru: ").strip()
+        if kelola in ("y", "t"):
+            break
+        print("Input tidak valid! Masukkan y atau t.")
+    if kelola == "y":
+        kelola_game_anggota(data)
+    jadwal_baru = input("Jadwal baru: ").strip()
 
-        if jadwal_baru != "":
-            data["jadwal"] = jadwal_baru
-        if nama_baru != "" and nama_baru != nama:
-            if nama_baru in anggota:
-                print("Nama baru sudah dipakai, nama tidak diubah.")
-            else:
-                anggota[nama_baru] = anggota.pop(nama)
-        print("Data anggota berhasil diubah!")
-    finally:
-        print("-" * 50)
+    if jadwal_baru != "":
+        data["jadwal"] = jadwal_baru
+    if nama_baru != "" and nama_baru != nama:
+        if nama_baru in anggota:
+            print("Nama baru sudah dipakai, nama tidak diubah.")
+        else:
+            anggota[nama_baru] = anggota.pop(nama)
+    print("Data anggota berhasil diubah!")
 
 
 def hapus_anggota():
     print("\n--- HAPUS ANGGOTA ---")
-    try:
-        if len(anggota) == 0:
-            raise ValueError("Belum ada anggota.")
-        tampilan.tampilkan_anggota(anggota)
-        nama = input("Ketik nama anggota yang dihapus: ").strip()
-        anggota.pop(nama)
-    except ValueError as pesan_error:
-        print(pesan_error)
-    except KeyError:
-        print("Anggota tidak ditemukan.")
-    else:
-        print("Anggota", nama, "berhasil dihapus.")
-    finally:
-        print("-" * 50)
+    if len(anggota) == 0:
+        print("Belum ada anggota.")
+        return
+    nama = validasi.pilih_anggota()
+    if nama is None:
+        print("Dibatalkan.")
+        return
+    if not konfirmasi("Yakin hapus anggota " + nama + "?"):
+        print("Penghapusan dibatalkan.")
+        return
+    anggota.pop(nama)
+    print("Anggota", nama, "berhasil dihapus.")
 
 
 # ---------- KELOLA GAME DAN ROLE (khusus admin) ----------
@@ -130,42 +138,60 @@ def hapus_anggota():
 
 def tambah_game():
     print("\n--- TAMBAH GAME ---")
-    try:
+    while True:
         game_baru = input("Nama game baru: ").strip()
         if game_baru == "":
-            raise ValueError("Nama game tidak boleh kosong!")
-        for game in GAME:
-            if game.lower() == game_baru.lower():
-                raise ValueError("Game sudah ada!")
+            print("Nama game tidak boleh kosong!")
+        elif any(game.lower() == game_baru.lower() for game in GAME):
+            print("Game sudah ada!")
+        else:
+            break
+    while True:
         role_pertama = input("Role pertama untuk game ini: ").strip()
         if role_pertama == "":
-            raise ValueError("Role pertama tidak boleh kosong!")
-    except ValueError as pesan_error:
-        print(pesan_error, "Game tidak ditambahkan.")
-    else:
-        GAME.append(game_baru)
-        ROLE[game_baru] = [role_pertama]
-        print("Game", game_baru, "berhasil ditambahkan.")
+            print("Role pertama tidak boleh kosong!")
+        else:
+            break
+    GAME.append(game_baru)
+    ROLE[game_baru] = [role_pertama]
+    print("Game", game_baru, "berhasil ditambahkan.")
 
 
 def hapus_game():
     print("\n--- HAPUS GAME ---")
-    try:
-        if len(GAME) <= 1:
-            raise ValueError("Minimal harus ada 1 game.")
-        game_dihapus = validasi.pilih_game()
-        pemakai = []
-        for nama, info in anggota.items():
-            if game_dihapus in info["game"]:
-                pemakai.append(nama)
-        if len(pemakai) > 0:
-            raise ValueError("Game tidak bisa dihapus, masih dipakai oleh: " + ", ".join(pemakai))
-    except ValueError as pesan_error:
-        print(pesan_error)
-    else:
-        GAME.remove(game_dihapus)
-        ROLE.pop(game_dihapus)
-        print("Game", game_dihapus, "berhasil dihapus.")
+    if len(GAME) <= 1:
+        print("Minimal harus ada 1 game.")
+        return
+    game_dihapus = validasi.pilih_game()
+    pemakai = [nama for nama, info in anggota.items() if game_dihapus in info["game"]]
+    if len(pemakai) > 0:
+        print("Game tidak bisa dihapus, masih dipakai oleh: " + ", ".join(pemakai))
+        return
+    if not konfirmasi("Yakin hapus game " + game_dihapus + "?"):
+        print("Penghapusan dibatalkan.")
+        return
+    GAME.remove(game_dihapus)
+    ROLE.pop(game_dihapus)
+    print("Game", game_dihapus, "berhasil dihapus.")
+
+
+def ubah_game():
+    print("\n--- UBAH GAME ---")
+    game_lama = validasi.pilih_game()
+    while True:
+        game_baru = input("Nama game baru: ").strip()
+        if game_baru == "":
+            print("Nama game tidak boleh kosong!")
+        elif any(g.lower() == game_baru.lower() for g in GAME if g != game_lama):
+            print("Nama game sudah dipakai!")
+        else:
+            break
+    GAME[GAME.index(game_lama)] = game_baru
+    ROLE[game_baru] = ROLE.pop(game_lama)
+    for info in anggota.values():
+        if game_lama in info["game"]:
+            info["game"][game_baru] = info["game"].pop(game_lama)
+    print("Game", game_lama, "berhasil diubah menjadi", game_baru + ".")
 
 
 def lihat_role():
@@ -176,55 +202,75 @@ def lihat_role():
 def tambah_role():
     print("\n--- TAMBAH ROLE ---")
     game = validasi.pilih_game()
-    try:
+    while True:
         role_baru = input("Nama role baru: ").strip()
         if role_baru == "":
-            raise ValueError("Nama role tidak boleh kosong!")
-        for role in ROLE[game]:
-            if role.lower() == role_baru.lower():      # "tank" dianggap sama dengan "Tank"
-                raise ValueError("Role sudah ada di " + game + "!")
-    except ValueError as pesan_error:
-        print(pesan_error)
-    else:
-        ROLE[game].append(role_baru)
-        print("Role", role_baru, "berhasil ditambahkan ke", game + ".")
+            print("Nama role tidak boleh kosong!")
+        elif any(role.lower() == role_baru.lower() for role in ROLE[game]):
+            print("Role sudah ada di " + game + "!")
+        else:
+            break
+    ROLE[game].append(role_baru)
+    print("Role", role_baru, "berhasil ditambahkan ke", game + ".")
 
 
 def hapus_role():
     print("\n--- HAPUS ROLE ---")
     game = validasi.pilih_game()
-    try:
-        if len(ROLE[game]) <= 1:
-            raise ValueError("Minimal harus ada 1 role di setiap game.")
-        role_dihapus = validasi.pilih_role(game)
-        pemakai = []
-        for nama, info in anggota.items():
-            if info["game"].get(game) == role_dihapus:
-                pemakai.append(nama)
-        if len(pemakai) > 0:
-            raise ValueError("Role tidak bisa dihapus, masih dipakai oleh: " + ", ".join(pemakai))
-    except ValueError as pesan_error:
-        print(pesan_error)
-    else:
-        ROLE[game].remove(role_dihapus)
-        print("Role", role_dihapus, "berhasil dihapus dari", game + ".")
+    if len(ROLE[game]) <= 1:
+        print("Minimal harus ada 1 role di setiap game.")
+        return
+    role_dihapus = validasi.pilih_role(game)
+    pemakai = [nama for nama, info in anggota.items() if info["game"].get(game) == role_dihapus]
+    if len(pemakai) > 0:
+        print("Role tidak bisa dihapus, masih dipakai oleh: " + ", ".join(pemakai))
+        return
+    if not konfirmasi("Yakin hapus role " + role_dihapus + " dari " + game + "?"):
+        print("Penghapusan dibatalkan.")
+        return
+    ROLE[game].remove(role_dihapus)
+    print("Role", role_dihapus, "berhasil dihapus dari", game + ".")
+
+
+def ubah_role():
+    print("\n--- UBAH ROLE ---")
+    game = validasi.pilih_game()
+    role_lama = validasi.pilih_role(game)
+    while True:
+        role_baru = input("Nama role baru: ").strip()
+        if role_baru == "":
+            print("Nama role tidak boleh kosong!")
+        elif any(r.lower() == role_baru.lower() for r in ROLE[game] if r != role_lama):
+            print("Nama role sudah dipakai di " + game + "!")
+        else:
+            break
+    ROLE[game][ROLE[game].index(role_lama)] = role_baru
+    for info in anggota.values():
+        if info["game"].get(game) == role_lama:
+            info["game"][game] = role_baru
+    print("Role", role_lama, "berhasil diubah menjadi", role_baru + ".")
 
 
 def menu_role():
     while True:
         tampilan.tampilkan_judul("KELOLA GAME DAN ROLE")
-        tampilan.tampilkan_menu(("Lihat game dan role", "Tambah game", "Hapus game",
-                                 "Tambah role", "Hapus role", "Kembali"))
-        pilih = validasi.minta_angka("Pilih menu: ", 6)
-        if pilih == 1:
+        aksi = validasi.pilih_dari_daftar(
+            "Pilih menu",
+            ("Lihat game dan role", "Tambah game", "Hapus game", "Ubah game",
+             "Tambah role", "Hapus role", "Ubah role", "Kembali"))
+        if aksi == "Lihat game dan role":
             lihat_role()
-        elif pilih == 2:
+        elif aksi == "Tambah game":
             tambah_game()
-        elif pilih == 3:
+        elif aksi == "Hapus game":
             hapus_game()
-        elif pilih == 4:
+        elif aksi == "Ubah game":
+            ubah_game()
+        elif aksi == "Tambah role":
             tambah_role()
-        elif pilih == 5:
+        elif aksi == "Hapus role":
             hapus_role()
+        elif aksi == "Ubah role":
+            ubah_role()
         else:
             break

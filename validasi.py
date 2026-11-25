@@ -1,33 +1,29 @@
+import inquirer
 from data import GAME, ROLE, anggota
 
 
-def minta_angka(pesan, batas):
-    while True:
-        try:
-            angka = int(input(pesan))
-            if angka < 1 or angka > batas:
-                raise ValueError
-        except ValueError:
-            print("Input tidak valid! Masukkan angka 1 sampai", batas)
-        else:
-            return angka
+def pilih_dari_daftar(pesan, daftar):
+    pertanyaan = [inquirer.List("pilihan", message=pesan, choices=list(daftar))]
+    jawaban = inquirer.prompt(pertanyaan)
+    return jawaban["pilihan"]
 
 
-def pilih_game(daftar=GAME):
-    print("\nPilihan game:")
-    for i in range(len(daftar)):
-        print(str(i + 1) + ".", daftar[i])
-    nomor = minta_angka("Pilih nomor game: ", len(daftar))
-    return daftar[nomor - 1]
+def pilih_game(daftar=None):
+    if daftar is None:
+        daftar = GAME
+    return pilih_dari_daftar("Pilih game", daftar)
 
 
 def pilih_role(game):
-    daftar_role = ROLE[game]                           # list role milik game tsb
-    print("\nPilihan role untuk", game + ":")
-    for i in range(len(daftar_role)):
-        print(str(i + 1) + ".", daftar_role[i])
-    nomor = minta_angka("Pilih nomor role: ", len(daftar_role))
-    return daftar_role[nomor - 1]
+    return pilih_dari_daftar("Pilih role untuk " + game, ROLE[game])
+
+
+def pilih_anggota():
+    daftar = list(anggota.keys()) + ["Batal"]
+    pilihan = pilih_dari_daftar("Pilih anggota", daftar)
+    if pilihan == "Batal":
+        return None
+    return pilihan
 
 
 def minta_nama_baru():

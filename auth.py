@@ -24,6 +24,28 @@ def login():
     print("Login gagal 3 kali. Kembali ke menu awal.")
 
 
+def register():
+    while True:
+        username = input("Username baru: ").strip()
+        if username == "":
+            print("Username tidak boleh kosong!")
+            continue
+        if username in akun:
+            print("Username sudah terdaftar!")
+            continue
+        password = input("Password baru: ").strip()
+        if password == "":
+            print("Password tidak boleh kosong!")
+            continue
+        ulangi = input("Ulangi password: ").strip()
+        if password != ulangi:
+            print("Password tidak sama, silakan ulangi.")
+            continue
+        akun[username] = {"password": password, "level": "user"}
+        print("Registrasi berhasil! Silakan login.")
+        return
+
+
 def logout():
     global pengguna_aktif, level_aktif
     pengguna_aktif = ""
