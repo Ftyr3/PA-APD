@@ -13,17 +13,17 @@ MENU_USER = ("Lihat semua anggota", "Cari anggota berdasarkan game dan role",
              "Jumlah anggota per role", "Logout")
 
 anggota = {
-    "RRQ BOLA": {"game": {"Mobile Legends": "Assassin", "Valorant": "Duelist"},
+    "RRQ BOLA": {"game": {"Mobile Legends": "Jungler", "Valorant": "Duelist"},
                     "jadwal": "Kapan aja"},
     "Evos galang": {"game": {"Mobile Legends": "Gold Laner", "PUBG Mobile": "Support"},
                       "jadwal": "Free kalau ga malam"},
     "Damm": {"game": {"Mobile Legends": "Exp Laner", "Free Fire": "Rusher"},
                 "jadwal": "Sabtu, Minggu"},
-    "Psych1cparty": {"game": {"Mobile Legend": "Roamer"},
+    "Psych1cparty": {"game": {"Mobile Legends": "Roamer"},
                       "jadwal": "Jumat malam"},
-    "bantu report baldy": {"game": {"Mobile Legend": "Roamer", "Valorant": "Sentinel"},
+    "bantu report baldy": {"game": {"Mobile Legends": "Roamer", "Valorant": "Sentinel"},
                             "jadwal": "kapan aja"},
-    "cape di troll baldy": {"game": {"Mobile Legend": "Jungler," " Gold Laner"}, 
+    "cape di troll baldy": {"game": {"Mobile Legends": "Jungler," " Gold Laner"}, 
                             "jadwal": "Bisa terus"},                         
 }
 
