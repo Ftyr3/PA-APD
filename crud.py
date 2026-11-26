@@ -133,7 +133,7 @@ def hapus_anggota():
     print("Anggota", nama, "berhasil dihapus.")
 
 
-# ---------- KELOLA GAME DAN ROLE (khusus admin) ----------
+# A
 
 
 def tambah_game():
